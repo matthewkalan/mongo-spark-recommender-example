@@ -29,7 +29,7 @@ object ALSExampleMongoDB {
     Logger.getLogger("org").setLevel(Level.WARN)
 
     val conf = new SparkConf().setAppName("ALSExampleMongoDB")
-    val sc = new SparkContext(conf)
+    val sc = SparkContext.getOrCreate(conf)
     val sqlContext = new SQLContext(sc)
     var ratings = sqlContext.emptyDataFrame    //because compiler needs definiton if we exit early
     
@@ -38,7 +38,8 @@ object ALSExampleMongoDB {
     //read from given data source
     val dsName = args(0).toLowerCase()
     if (dsName == "mongodb") {
-      ratings = sqlContext.read.mongo()
+      var inputUri = args(1)
+      ratings = sqlContext.read.option("uri", inputUri).mongo()
       ratings.printSchema()
     } else if (dsName == "file" ) {
       import sqlContext.implicits._
