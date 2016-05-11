@@ -30,7 +30,7 @@ object ALSExampleMongoDB {
 
     //val conf = new SparkConf().setAppName("ALSExampleMongoDB")
     val sc = SparkContext.getOrCreate()
-    val sqlContext = new SQLContext(sc)
+    val sqlContext = SQLContext.getOrCreate(sc)
     var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
     
     println("args length = " + args.length + ", 0: " + args(0))
