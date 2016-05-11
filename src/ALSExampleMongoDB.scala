@@ -28,18 +28,18 @@ object ALSExampleMongoDB {
    
     Logger.getLogger("org").setLevel(Level.WARN)
 
-    val conf = new SparkConf().setAppName("ALSExampleMongoDB")
-    val sc = SparkContext.getOrCreate(conf)
+    //val conf = new SparkConf().setAppName("ALSExampleMongoDB")
+    val sc = SparkContext.getOrCreate()
     val sqlContext = new SQLContext(sc)
-    var ratings = sqlContext.emptyDataFrame    //because compiler needs definiton if we exit early
+    var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
     
     println("args length = " + args.length + ", 0: " + args(0))
     
     //read from given data source
     val dsName = args(0).toLowerCase()
     if (dsName == "mongodb") {
-      var inputUri = args(1)
-      ratings = sqlContext.read.option("uri", inputUri).mongo()
+      var inputUri = args(1)                                       //pass MongoDB connection string from args[]
+      ratings = sqlContext.read.option("uri", inputUri).mongo()     
       ratings.printSchema()
     } else if (dsName == "file" ) {
       import sqlContext.implicits._
@@ -73,6 +73,7 @@ object ALSExampleMongoDB {
       .setPredictionCol("prediction")
     val rmse = evaluator.evaluate(predictions)
     println(s"Root-mean-square error = $rmse")
-    sc.stop()
+    
+    // sc.stop()    //removed because using shared SC
   }
 }

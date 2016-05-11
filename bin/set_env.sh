@@ -7,7 +7,7 @@ export MAIN_JAR_HOME="/Users/mkalan/github/mongo-spark-recommender-example/targe
 export MAIN_CLASS_NAME="ALSExampleMongoDB"
 export NUM_THREADS="2"
 export PACKAGES="org.mongodb.spark:mongo-spark-connector_2.10:0.1"
-export MONGODB_INPUT_CONN_STRING=mongodb://127.0.0.1/movielens.ratings?readPreference=primaryPreferred
+export MONGODB_INPUT_CONN_STRING=mongodb://mkalan-dev-0.mkalan-dev.57052e45e4b0c1b45d557c13.mongodbdns.com/movielens.ratings
 export MONGODB_OUTPUT_CONN_STRING=
 
 # if using file for data
