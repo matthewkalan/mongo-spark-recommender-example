@@ -32,9 +32,9 @@ object ALSExampleMongoDB {
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
-    
+        
     println("args length = " + args.length + ", 0: " + args(0))
-    
+        
     //read from given data source
     val dsName = args(0).toLowerCase()
     if (dsName == "mongodb") {
