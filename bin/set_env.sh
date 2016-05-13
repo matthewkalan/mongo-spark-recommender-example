@@ -9,6 +9,7 @@ export NUM_THREADS="2"
 export PACKAGES="org.mongodb.spark:mongo-spark-connector_2.10:0.1"
 export MONGODB_INPUT_CONN_STRING=mongodb://mkalan-dev-0.mkalan-dev.57052e45e4b0c1b45d557c13.mongodbdns.com/movielens.ratings
 export MONGODB_OUTPUT_CONN_STRING=
+export SPARK_URL=spark://10.214.237.198:7077
 
 # if using file for data
 export DATA_HOME="/Users/mkalan/github/mongo-spark-recommender-example/data/sample_movielens_ratings.txt"

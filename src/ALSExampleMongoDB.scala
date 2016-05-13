@@ -27,9 +27,9 @@ object ALSExampleMongoDB {
   def main(args: Array[String]) {
    
     Logger.getLogger("org").setLevel(Level.WARN)
-
-    //val conf = new SparkConf().setAppName("ALSExampleMongoDB")
-    val sc = SparkContext.getOrCreate()
+ 
+    val conf = new SparkConf().setMaster(args(2)).setAppName("ALSExampleMongoDB")
+    val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
     var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
         
