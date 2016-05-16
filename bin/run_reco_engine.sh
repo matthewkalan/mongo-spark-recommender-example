@@ -10,10 +10,11 @@ echo "Spark home = $SPARK_HOME"
 # Run recommendation engine example
 exec $SPARK_HOME/bin/spark-submit \
 	--class $MAIN_CLASS_NAME \
-	--master local[2] \
 	--packages $PACKAGES \
-	#--conf "spark.mongodb.input.uri=$MONGODB_INPUT_CONN_STRING" \
 	$MAIN_JAR_HOME \
 	mongodb \
 	$MONGODB_INPUT_CONN_STRING
+	local
 	
+	# --conf "spark.mongodb.input.uri=$MONGODB_INPUT_CONN_STRING" \	
+	/ #--master local[2] \

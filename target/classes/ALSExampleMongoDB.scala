@@ -28,18 +28,21 @@ object ALSExampleMongoDB {
    
     Logger.getLogger("org").setLevel(Level.WARN)
  
-    val conf = new SparkConf().setMaster(args(2)).setAppName("ALSExampleMongoDB")
+    val conf = new SparkConf()
+      .setMaster(args(2))
+      .setAppName("ALSExampleMongoDB")
+      .set("spark.mongodb.input.uri", args(1))
     val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
     var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
-        
-    println("args length = " + args.length + ", 0: " + args(0))
-        
+                
     //read from given data source
     val dsName = args(0).toLowerCase()
     if (dsName == "mongodb") {
       var inputUri = args(1)                                       //pass MongoDB connection string from args[]
-      ratings = sqlContext.read.option("uri", inputUri).mongo()     
+      println("inputUri = " + inputUri)
+      //ratings = sqlContext.read.option("uri", inputUri).mongo()
+      ratings = sqlContext.read.mongo()
       ratings.printSchema()
     } else if (dsName == "file" ) {
       import sqlContext.implicits._
