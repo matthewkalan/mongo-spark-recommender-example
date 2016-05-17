@@ -4,5 +4,5 @@
 	<classpathentry kind="lib" path="/Users/mkalan/dev/spark-1.6.1-bin-hadoop2.6/lib/spark-assembly-1.6.1-hadoop2.6.0.jar"/>
 	<classpathentry kind="lib" path="/Users/mkalan/dev/mongo-spark-connector/mongo-spark-connector_2.10-0.1.jar"/>
 	<classpathentry kind="lib" path="/Users/mkalan/dev/mongo-java-driver-3.2.2/mongo-java-driver-3.2.2.jar"/>
-	<classpathentry kind="output" path="out"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

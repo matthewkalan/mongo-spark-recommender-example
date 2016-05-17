@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>mongoo-spark-recommender-example</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.scala-ide.sdt.core.scalabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+<<<<<<< HEAD
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+=======
+	</buildSpec>
+	<natures>
+>>>>>>> refs/remotes/origin/master
+		<nature>org.scala-ide.sdt.core.scalanature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>
