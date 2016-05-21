@@ -41,8 +41,7 @@ object ALSExampleMongoDB {
     if (dsName == "mongodb") {
       var inputUri = args(1)                                       //pass MongoDB connection string from args[]
       println("inputUri = " + inputUri)
-      //ratings = sqlContext.read.option("uri", inputUri).mongo()
-      ratings = sqlContext.read.mongo()
+      ratings = sqlContext.read.option("uri", inputUri).mongo()
       ratings.printSchema()
     } else if (dsName == "file" ) {
       import sqlContext.implicits._
