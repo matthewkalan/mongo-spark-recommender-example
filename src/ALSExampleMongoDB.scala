@@ -13,6 +13,11 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.DataFrame
 import com.mongodb.spark.sql._
 
+import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Date
+//import java.util.concurrent.TimeUnit
+
 object ALSExampleMongoDB {
 
   case class Rating(userId: Int, movieId: Int, rating: Float, timestamp: Long)
@@ -23,11 +28,23 @@ object ALSExampleMongoDB {
       Rating(fields(0).toInt, fields(1).toInt, fields(2).toFloat, fields(3).toLong)
     }
   }
-
+  
+  /*
+  def getDateDiff(date1: Date, date2:Date, timeUnit:TimeUnit) : Long = {
+      
+    val diffInMillies = date2.getTime() - date1.getTime()
+    return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS)
+  }*/
+  
   def main(args: Array[String]) {
    
     Logger.getLogger("org").setLevel(Level.WARN)
  
+    // get current time at beginning and end to calculate job latency
+    val formatter = new SimpleDateFormat("hh:mm:ss")
+    val startTime = Calendar.getInstance().getTime()
+    println("Start time:" + formatter.format(startTime))
+    
     val conf = new SparkConf()
       .setMaster(args(2))
       .setAppName("ALSExampleMongoDB")
@@ -76,6 +93,9 @@ object ALSExampleMongoDB {
     val rmse = evaluator.evaluate(predictions)
     println(s"Root-mean-square error = $rmse")
     
-    // sc.stop()    //removed because using shared SC
+    val endTime = Calendar.getInstance().getTime()
+    var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
+    println("End time:" + formatter.format(endTime) + ", Total time: " + elapsedTime + " seconds")
+    
   }
 }
