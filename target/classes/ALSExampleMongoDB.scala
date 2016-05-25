@@ -1,4 +1,4 @@
-
+package com.mongodb.spark.examples
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.ml.evaluation.RegressionEvaluator
@@ -28,14 +28,7 @@ object ALSExampleMongoDB {
       Rating(fields(0).toInt, fields(1).toInt, fields(2).toFloat, fields(3).toLong)
     }
   }
-  
-  /*
-  def getDateDiff(date1: Date, date2:Date, timeUnit:TimeUnit) : Long = {
-      
-    val diffInMillies = date2.getTime() - date1.getTime()
-    return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS)
-  }*/
-  
+    
   def main(args: Array[String]) {
    
     Logger.getLogger("org").setLevel(Level.WARN)
