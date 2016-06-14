@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mongodb.spark</groupId>
+  <groupId>org.mongodb.spark.examples</groupId>
   <artifactId>reco-engine-example</artifactId>
-  <version>0.0.6</version>
-  <name>reco-engine-example</name>
+  <version>0.1</version>
+  <name>Mongo Spark Recommender Example</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -25,19 +25,15 @@
       </plugin>
     </plugins>
   </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.mongodb.spark</groupId>
-  		<artifactId>mongo-spark-connector_2.10</artifactId>
-  	</dependency>
-  </dependencies>
   <dependencyManagement>
   	<dependencies>
   		<dependency>
   			<groupId>org.mongodb.spark</groupId>
   			<artifactId>mongo-spark-connector_2.10</artifactId>
-  			<version>0.1</version>
+  			<version>0.3</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
+  <url>https://github.com/matthewkalan/mongo-spark-recommender-example/</url>
+  <description>Example from a MongoDB World 2016 talk on an ALS algo for a recommendation engine running on Spark from data in MongoDB</description>
 </project>

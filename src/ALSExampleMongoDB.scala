@@ -11,6 +11,7 @@ import org.apache.spark.{SparkContext, SparkConf}
 import com.mongodb.spark._
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.DataFrame
+//import org.apache.spark.sql.DataFrameNaFunctions
 import com.mongodb.spark.sql._
 
 import java.util.Calendar
@@ -79,14 +80,17 @@ object ALSExampleMongoDB {
       val predictions = model.transform(test)
         .withColumn("rating", col("rating").cast(DoubleType))
         .withColumn("prediction", col("prediction").cast(DoubleType))
+        
+      //remove NaN values if a user is not in both the training and test dataframe
+      val predictionsValidUsers = predictions.na.drop("any", Seq("rating", "prediction"))
   
       val evaluator = new RegressionEvaluator()
         .setMetricName("rmse")
         .setLabelCol("rating")
         .setPredictionCol("prediction")
-      val rmse = evaluator.evaluate(predictions)
+      val rmse = evaluator.evaluate(predictionsValidUsers)
       println(s"Root-mean-square error = $rmse")
-      
+            
       val endTime = Calendar.getInstance().getTime()
       var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
       println("End time:" + formatter.format(endTime) + ", Total time: " + elapsedTime + " seconds")
