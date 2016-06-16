@@ -40,7 +40,7 @@ object ALSExampleMongoDB {
     
     //this conf should only be used when run locally because sc.getOrCreate() is called below
     val conf = new SparkConf()      
-      .setMaster("local")
+      .setMaster("local[3]")
       .setAppName("ALSExampleMongoDB")
     val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
@@ -54,6 +54,15 @@ object ALSExampleMongoDB {
       var inputUri = args(1)                                       //pass MongoDB connection string from args
       println("inputUri = " + inputUri)
       ratings = sqlContext.read.option("uri", inputUri).mongo()
+      ratings.cache()
+      //adding options for allowing MongoDB Spark Connector to choose local Mongos
+      /* ratings = sqlContext.read.options(
+          Map(
+               "uri" -> inputUri, 
+               "localThreshold" -> "0",
+               "readPreference.name" -> "nearest"
+          )).mongo()
+      */
       ratings.printSchema()
       validInput = true
     } else if (args(0).toLowerCase() == "file" ) {
@@ -89,7 +98,7 @@ object ALSExampleMongoDB {
         .setLabelCol("rating")
         .setPredictionCol("prediction")
       val rmse = evaluator.evaluate(predictionsValidUsers)
-      println(s"Root-mean-square error = $rmse")
+      println(s"\nRoot-mean-square error = $rmse")
             
       val endTime = Calendar.getInstance().getTime()
       var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
