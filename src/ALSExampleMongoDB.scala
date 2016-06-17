@@ -44,10 +44,10 @@ object ALSExampleMongoDB {
       .setAppName("ALSExampleMongoDB")
     val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
-    var ratings = sqlContext.emptyDataFrame    //because compiler needs definition if we exit early
+    var ratings = sqlContext.emptyDataFrame    
     var validInput = false
     
-    //confirm 2 arguments of proper values
+    //confirm arguments of proper values
     if (args.length == 0) {
       println("# of args: " + args.length + "\nArgs expected: mongodb|file <mongodb connection string>|<file-location>")
     } else if (args(0).toLowerCase() == "mongodb") {
@@ -65,7 +65,7 @@ object ALSExampleMongoDB {
       */
       ratings.printSchema()
       validInput = true
-    } else if (args(0).toLowerCase() == "file" ) {
+    } else if (args(0).toLowerCase() == "file" ) {      //just for running from a file
       import sqlContext.implicits._
       ratings = sc.textFile(args(1))
         .map(Rating.parseRating)
@@ -99,6 +99,10 @@ object ALSExampleMongoDB {
         .setPredictionCol("prediction")
       val rmse = evaluator.evaluate(predictionsValidUsers)
       println(s"\nRoot-mean-square error = $rmse")
+      
+      //store the users predictions
+      var outputUri = args(2)
+      val ms = MongoSpark.save(predictionsValidUsers.write.option("uri", outputUri))
             
       val endTime = Calendar.getInstance().getTime()
       var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
