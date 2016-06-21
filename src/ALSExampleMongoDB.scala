@@ -38,9 +38,9 @@ object ALSExampleMongoDB {
     val startTime = Calendar.getInstance().getTime()
     println("Start time: " + formatter.format(startTime))
     
-    //this conf should only be used when run locally because sc.getOrCreate() is called below
+    //this conf should only be used when run locally because sc.getOrCreate() reuses already running SparkContexts
     val conf = new SparkConf()      
-      .setMaster("local[3]")
+      .setMaster("local[4]")
       .setAppName("ALSExampleMongoDB")
     val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
@@ -50,21 +50,26 @@ object ALSExampleMongoDB {
     //confirm arguments of proper values
     if (args.length == 0) {
       println("# of args: " + args.length + "\nArgs expected: mongodb|file <mongodb connection string>|<file-location>")
+      
     } else if (args(0).toLowerCase() == "mongodb") {
       var inputUri = args(1)                                       //pass MongoDB connection string from args
       println("inputUri = " + inputUri)
-      ratings = sqlContext.read.option("uri", inputUri).mongo()
-      ratings.cache()
+      //ratings = sqlContext.read.option("uri", inputUri).mongo()
+      
       //adding options for allowing MongoDB Spark Connector to choose local Mongos
-      /* ratings = sqlContext.read.options(
+      ratings = sqlContext.read.options(
           Map(
                "uri" -> inputUri, 
-               "localThreshold" -> "0",
-               "readPreference.name" -> "nearest"
+               //"localThreshold" -> "0",
+               //"readPreference.name" -> "nearest"
+               "partitioner" -> "MongoSamplePartitioner",
+               "partitionerOptions.partitionSizeMB" -> "10"
           )).mongo()
-      */
-      ratings.printSchema()
+      
+      println("Number of partition in ratings = " + ratings.rdd.getNumPartitions)
+      ratings.cache()
       validInput = true
+      
     } else if (args(0).toLowerCase() == "file" ) {      //just for running from a file
       import sqlContext.implicits._
       ratings = sc.textFile(args(1))
@@ -75,6 +80,11 @@ object ALSExampleMongoDB {
 
     if (validInput) {
       val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))
+
+      //val Array(trainingPrePart, testPrePart) = ratings.randomSplit(Array(0.8, 0.2))
+      //check if partitioning Dataframes help performance
+      //val training = trainingPrePart.repartition(10)
+      //val test = testPrePart.repartition(10)
   
       // Build the recommendation model using ALS on the training data
       val als = new ALS()
@@ -102,7 +112,7 @@ object ALSExampleMongoDB {
       
       //store the users predictions
       var outputUri = args(2)
-      val ms = MongoSpark.save(predictionsValidUsers.write.option("uri", outputUri))
+      MongoSpark.save(predictionsValidUsers.write.option("uri", outputUri))
             
       val endTime = Calendar.getInstance().getTime()
       var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
