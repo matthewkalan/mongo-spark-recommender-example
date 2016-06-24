@@ -54,23 +54,24 @@ object ALSExampleMongoDB {
     } else if (args(0).toLowerCase() == "mongodb") {
       var inputUri = args(1)                                       //pass MongoDB connection string from args
       println("inputUri = " + inputUri)
-      //ratings = sqlContext.read.option("uri", inputUri).mongo()
       
-      //adding options for allowing MongoDB Spark Connector to choose local Mongos
+      //setting up DataFrame to read from MongoDB - Connector automatically partitions the data to spread across workers
       ratings = sqlContext.read.options(
           Map(
-               "uri" -> inputUri, 
-               //"localThreshold" -> "0",
-               //"readPreference.name" -> "nearest"
-               "partitioner" -> "MongoSamplePartitioner",
-               "partitionerOptions.partitionSizeMB" -> "10"
+               "uri" -> inputUri 
+               //"localThreshold" -> "0",                       //Add these two parameters to connect to the nearest Mongos, if desired
+               //"readPreference.name" -> "nearest",
+               //"partitionerOptions.partitionSizeMB" -> "512",  //Typically partitions should be 64 - 512 MB
+               //"partitioner" -> "MongoSamplePartitioner"      //If customer partitioner desired
           )).mongo()
       
       println("Number of partition in ratings = " + ratings.rdd.getNumPartitions)
+      
+      //caching the DataFrame in memory of Spark workers is often beneficial
       ratings.cache()
       validInput = true
       
-    } else if (args(0).toLowerCase() == "file" ) {      //just for running from a file
+    } else if (args(0).toLowerCase() == "file" ) {      //just for running from a file, as in the example I copied
       import sqlContext.implicits._
       ratings = sc.textFile(args(1))
         .map(Rating.parseRating)
@@ -79,12 +80,7 @@ object ALSExampleMongoDB {
     }
 
     if (validInput) {
-      val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))
-
-      //val Array(trainingPrePart, testPrePart) = ratings.randomSplit(Array(0.8, 0.2))
-      //check if partitioning Dataframes help performance
-      //val training = trainingPrePart.repartition(10)
-      //val test = testPrePart.repartition(10)
+      val Array(training, test) = ratings.randomSplit(Array(0.8, 0.2))    //split into a training and test dataset
   
       // Build the recommendation model using ALS on the training data
       val als = new ALS()
@@ -93,14 +89,14 @@ object ALSExampleMongoDB {
         .setUserCol("userId")
         .setItemCol("movieId")
         .setRatingCol("rating")
-      val model = als.fit(training)
+      val model = als.fit(training)      //train the model
   
       // Evaluate the model by computing the RMSE on the test data
       val predictions = model.transform(test)
         .withColumn("rating", col("rating").cast(DoubleType))
         .withColumn("prediction", col("prediction").cast(DoubleType))
         
-      //remove NaN values if a user is not in both the training and test dataframe
+      //remove NaN values if a user is not in both the training and test dataset
       val predictionsValidUsers = predictions.na.drop("any", Seq("rating", "prediction"))
   
       val evaluator = new RegressionEvaluator()
@@ -108,15 +104,17 @@ object ALSExampleMongoDB {
         .setLabelCol("rating")
         .setPredictionCol("prediction")
       val rmse = evaluator.evaluate(predictionsValidUsers)
+      
       println(s"\nRoot-mean-square error = $rmse")
       
-      //store the users predictions
+      //store the users predictions back into MongoDB
       var outputUri = args(2)
       MongoSpark.save(predictionsValidUsers.write.option("uri", outputUri))
             
+      //calculate and print running time in seconds
       val endTime = Calendar.getInstance().getTime()
       var elapsedTime = (endTime.getTime() - startTime.getTime()) / 1000
-      println("End time:" + formatter.format(endTime) + ", Total time: " + elapsedTime + " seconds")
+      println("\nEnd time:" + formatter.format(endTime) + ", Total time: " + elapsedTime + " seconds")
     } 
   }
 }
