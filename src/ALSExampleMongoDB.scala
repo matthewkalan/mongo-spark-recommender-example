@@ -20,6 +20,7 @@ import java.util.Date
 
 object ALSExampleMongoDB {
 
+  //only used in example loading from a file
   case class Rating(userId: Int, movieId: Int, rating: Float, timestamp: Long)
   object Rating {
     def parseRating(str: String): Rating = {
@@ -44,7 +45,7 @@ object ALSExampleMongoDB {
       .setAppName("ALSExampleMongoDB")
     val sc = SparkContext.getOrCreate(conf)
     val sqlContext = SQLContext.getOrCreate(sc)
-    var ratings = sqlContext.emptyDataFrame    
+    var ratings = sqlContext.emptyDataFrame
     var validInput = false
     
     //confirm arguments of proper values
@@ -56,15 +57,17 @@ object ALSExampleMongoDB {
       println("inputUri = " + inputUri)
       
       //setting up DataFrame to read from MongoDB - Connector automatically partitions the data to spread across workers
-      ratings = sqlContext.read.options(
+      var ratingsAll = sqlContext.read.options(
           Map(
                "uri" -> inputUri 
                //"localThreshold" -> "0",                       //Add these two parameters to connect to the nearest Mongos, if desired
                //"readPreference.name" -> "nearest",
-               //"partitionerOptions.partitionSizeMB" -> "512",  //Typically partitions should be 64 - 512 MB
+               //"partitionerOptions.partitionSizeMB" -> "512", //Typically partitions should be 64 - 512 MB
                //"partitioner" -> "MongoSamplePartitioner"      //If customer partitioner desired
           )).mongo()
-      
+      var userIdThreshold = args(3)
+      ratings = ratingsAll.filter(ratingsAll("userId") > userIdThreshold)    //Filtering and aggregation are pushed down to the DB, using indexes
+                
       println("Number of partition in ratings = " + ratings.rdd.getNumPartitions)
       
       //caching the DataFrame in memory of Spark workers is often beneficial
