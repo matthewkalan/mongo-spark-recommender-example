@@ -19,7 +19,9 @@ You will need to [install Spark](http://spark.apache.org/downloads.html) or othe
 Also you will need to have a MongoDB database running on a hostname and port.  There are multiple options to [running MongoDB](https://www.mongodb.com/download-center), either with the cloud service Atlas, or downloading and installing.  
 
 You should decompress the data from /data/ratings.csv.zip and import it into MongoDB using [mongoimport]() with a command similar to:
+```
 mongodb-osx-x86_64-3.2.7-ent/bin/mongoimport --type csv -d movielens -c ratings --port 27017 --fields userId,movieId,rating,timestamp ratings.csv
+```
 
 You will also need Maven or the ability to otherwise create a JAR from the source files.  I used the Maven plug-in in Eclipse with the pom.xml in the root directory of this project.  The Instructions below assume you have built the JAR.  
 
