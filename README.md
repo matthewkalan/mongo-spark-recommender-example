@@ -30,13 +30,11 @@ To optionally build the project in Eclipse (with the Perspective for Scala), I d
 ## Instructions For Running the Example
 
 * Clone this project from Github or otherwise download it
+```
 git clone https://github.com/matthewkalan/mongo-spark-recommender-example.git
-
+```
 * Make sure the dependencies above are addressed
-
 * If you have run the example before, drop the predictions table so that it can be generated again during the run.  
-
 * Edit the script in bin/set_env.sh specific to your environment
-
 * Run bin/run_reco_engine.sh.  You will see output in the console with the Root mean square error of the predicted user ratings and the Total running time.  
 
